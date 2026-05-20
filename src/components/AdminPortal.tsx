@@ -161,7 +161,7 @@ const AdminPortal: React.FC = () => {
 
   const updateProgress = async (id: string, progress: number) => {
     try {
-      const res = await fetch(`/api/track/${id}`, {
+      const res = await fetch(`/api/track?id=${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ const AdminPortal: React.FC = () => {
     if (!window.confirm('Delete this shipment permanently?')) return;
     setDeletingShipmentId(id);
     try {
-      const res = await fetch(`/api/shipments/${id}`, {
+      const res = await fetch(`/api/shipments?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: {
           'x-admin-password': adminPassword,

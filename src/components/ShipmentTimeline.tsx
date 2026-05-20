@@ -18,7 +18,7 @@ const ShipmentTimeline: React.FC<ShipmentTimelineProps> = ({ shipment }) => {
         {/* Connector Line */}
         <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-slate-100 z-0" />
 
-        {shipment.timeline.map((event, index) => (
+        {(shipment.timeline || []).map((event, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, x: -10 }}
@@ -51,7 +51,7 @@ const ShipmentTimeline: React.FC<ShipmentTimelineProps> = ({ shipment }) => {
              <div className="mt-1.5 rounded-full w-6 h-6 shrink-0 border-2 border-slate-200 bg-white" />
             <div className="flex-1">
               <p className="text-sm font-bold text-slate-800">Final Destination Arrival</p>
-              <p className="text-[10px] text-slate-500 italic mt-1 uppercase tracking-tight">Scheduled Hub: {shipment.destination.name}</p>
+              <p className="text-[10px] text-slate-500 italic mt-1 uppercase tracking-tight">Scheduled Hub: {shipment.destination?.name || 'Destination'}</p>
             </div>
           </div>
         )}

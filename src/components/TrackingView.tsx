@@ -14,13 +14,14 @@ const TrackingView: React.FC = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trackingId) return;
+    const normalizedTrackingId = trackingId.trim().toUpperCase();
+    if (!normalizedTrackingId) return;
     
     setLoading(true);
     setError('');
     
     try {
-      const res = await fetch(`/api/track/${trackingId}`);
+      const res = await fetch(`/api/track?id=${encodeURIComponent(normalizedTrackingId)}`);
       if (!res.ok) throw new Error("Tracking ID not found");
       const data = await res.json();
       setShipment(data);
@@ -180,11 +181,11 @@ const TrackingView: React.FC = () => {
                 <div className="absolute bottom-4 left-4 right-4 z-10 hidden md:grid grid-cols-2 gap-4">
                   <div className="bg-white/90 backdrop-blur p-3 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Origin</p>
-                    <p className="text-xs font-bold text-slate-900 truncate">{shipment.origin.name}</p>
+                    <p className="text-xs font-bold text-slate-900 truncate">{shipment.origin?.name || 'Origin'}</p>
                   </div>
                   <div className="bg-white/90 backdrop-blur p-3 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Destination</p>
-                    <p className="text-xs font-bold text-slate-900 truncate">{shipment.destination.name}</p>
+                    <p className="text-xs font-bold text-slate-900 truncate">{shipment.destination?.name || 'Destination'}</p>
                   </div>
                 </div>
               </div>
