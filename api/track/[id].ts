@@ -1,5 +1,5 @@
-import { shipmentsCollection, logsCollection } from '../_firebase';
-import { isAdminPasswordValid } from '../_auth';
+import { shipmentsCollection, logsCollection } from '../../server/firebase.js';
+import { isAdminPasswordValid } from '../../server/auth.js';
 
 const buildShipment = (doc: any) => ({
   id: doc.id,

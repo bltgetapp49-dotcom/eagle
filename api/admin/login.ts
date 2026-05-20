@@ -1,4 +1,4 @@
-import { ADMIN_PASSWORD } from '../_firebase';
+import { ADMIN_PASSWORD } from '../../server/config.js';
 
 export default function handler(req: any, res: any) {
   if (req.method !== 'POST') {

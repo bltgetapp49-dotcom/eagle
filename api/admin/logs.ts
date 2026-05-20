@@ -1,5 +1,5 @@
-import { logsCollection } from '../_firebase';
-import { isAdminPasswordValid } from '../_auth';
+import { logsCollection } from '../../server/firebase.js';
+import { isAdminPasswordValid } from '../../server/auth.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {

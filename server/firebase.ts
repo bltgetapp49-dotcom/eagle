@@ -1,15 +1,22 @@
 import admin from 'firebase-admin';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const parseServiceAccount = (raw: string) => {
+  let credentials;
   try {
-    return JSON.parse(raw);
-  } catch (firstError) {
+    credentials = JSON.parse(raw);
+  } catch {
     const normalized = raw.replace(/\\r\\n/g, '\\n').replace(/\\n/g, '\\n');
-    return JSON.parse(normalized);
+    credentials = JSON.parse(normalized);
   }
+
+  if (typeof credentials.private_key === 'string') {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+  }
+
+  return credentials;
 };
 
 const firebaseCredentials = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
@@ -27,4 +34,3 @@ if (!admin.apps.length) {
 export const db = admin.firestore();
 export const shipmentsCollection = db.collection('shipments');
 export const logsCollection = db.collection('admin_logs');
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
