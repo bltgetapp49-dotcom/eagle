@@ -303,7 +303,7 @@ const AdminPortal: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
-      <header className="bg-fdx-purple text-white px-4 md:px-6 py-4 flex items-center justify-start shrink-0 sticky top-0 z-50 shadow-md">
+      <header className="bg-[#4D148C] text-white px-4 md:px-6 py-4 flex items-center justify-start shrink-0 sticky top-0 z-50 shadow-md">
         <img src={FDX_LOGO_WHITE_URL} alt="Fdx" className="h-8 md:h-10 w-auto" />
       </header>
 

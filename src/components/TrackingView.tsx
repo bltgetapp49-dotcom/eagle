@@ -35,7 +35,7 @@ const TrackingView: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden">
       {/* Fdx Style Header */}
-      <header className="bg-fdx-purple text-white px-4 md:px-8 py-3 flex items-center justify-start sticky top-0 z-[100]">
+      <header className="bg-[#4D148C] text-white px-4 md:px-8 py-3 flex items-center justify-start sticky top-0 z-[100]">
         <img 
           src={FDX_LOGO_WHITE_URL} 
           alt="Fdx Logo" 
@@ -223,7 +223,7 @@ const TrackingView: React.FC = () => {
 
                 <div className="p-4 bg-white border-t border-slate-200">
                   <div className="flex justify-between items-center text-[9px] text-slate-400 font-black uppercase tracking-tighter">
-                    <span>Fdx Enterprise &copy; 2024</span>
+                    <span>Fdx Enterprise &copy; 2026</span>
                     <button title="Help" aria-label="Help" className="hover:text-fdx-purple"><HelpCircle className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
