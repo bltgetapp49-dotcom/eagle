@@ -1,8 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, User, MapPin, Loader2, Save, Package, Trash2, ClipboardList } from 'lucide-react';
+import { Plus, User, Loader2, Trash2, ClipboardList } from 'lucide-react';
 import { Shipment } from '../lib/types';
 import { FDX_LOGO_URL, FDX_LOGO_WHITE_URL } from '../lib/config';
 import { motion, AnimatePresence } from 'framer-motion';
+
+type AdminLog = {
+  id: string;
+  action: string;
+  shipmentId: string;
+  details: unknown;
+  timestamp: string | { _seconds?: number; seconds?: number };
+};
+
+const formatFirestoreDate = (value: AdminLog['timestamp']) => {
+  if (!value) return 'Unknown time';
+  if (typeof value === 'string') return new Date(value).toLocaleString();
+
+  const seconds = value._seconds ?? value.seconds;
+  if (typeof seconds === 'number') {
+    return new Date(seconds * 1000).toLocaleString();
+  }
+
+  return 'Unknown time';
+};
+
+const formatLogDetails = (details: unknown) => {
+  if (!details) return 'No details recorded.';
+  if (typeof details === 'string') return details;
+
+  if (typeof details === 'object' && 'shipment' in details) {
+    const shipment = (details as { shipment?: Partial<Shipment> }).shipment;
+    if (shipment) {
+      return `Created ${shipment.packageName || 'shipment'} for ${shipment.customerName || 'customer'}.`;
+    }
+  }
+
+  if (typeof details === 'object' && 'deletedAt' in details) {
+    return 'Shipment deleted from the dashboard.';
+  }
+
+  if (typeof details === 'object' && 'updatedShipment' in details) {
+    const updatedShipment = (details as { updatedShipment?: Partial<Shipment> }).updatedShipment;
+    return `Updated shipment progress to ${updatedShipment?.progress ?? 'latest'}%.`;
+  }
+
+  return JSON.stringify(details);
+};
 
 const AdminPortal: React.FC = () => {
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -13,7 +56,7 @@ const AdminPortal: React.FC = () => {
   const [adminPassword, setAdminPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [deletingShipmentId, setDeletingShipmentId] = useState<string | null>(null);
-  const [adminLogs, setAdminLogs] = useState<Array<{ id: string; action: string; shipmentId: string; details: string; timestamp: string }>>([]);
+  const [adminLogs, setAdminLogs] = useState<AdminLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   
   const [newShipment, setNewShipment] = useState({
@@ -65,7 +108,7 @@ const AdminPortal: React.FC = () => {
         return;
       }
       const data = await res.json();
-      setAdminLogs(data);
+      setAdminLogs(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch admin logs', error);
     } finally {
@@ -108,7 +151,7 @@ const AdminPortal: React.FC = () => {
         return;
       }
       const data = await res.json();
-      setShipments(data);
+      setShipments(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch shipments", error);
     } finally {
@@ -167,6 +210,9 @@ const AdminPortal: React.FC = () => {
         body: JSON.stringify(payload)
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to create shipment');
+      }
       setShipments(prev => [...prev, data]);
       await fetchAdminLogs();
       setIsCreating(false);
@@ -367,12 +413,12 @@ const AdminPortal: React.FC = () => {
                     <div className="flex items-center gap-6 md:gap-10 w-full sm:w-auto">
                       <div className="text-left sm:text-right flex-1 sm:flex-none">
                         <p className="text-[8px] uppercase font-black text-slate-300 tracking-widest mb-1">Origin</p>
-                        <p className="text-[11px] md:text-sm font-black text-slate-700 uppercase">{shipment.origin.name || 'WH'}</p>
+                        <p className="text-[11px] md:text-sm font-black text-slate-700 uppercase">{shipment.origin?.name || 'WH'}</p>
                       </div>
                       <div className="h-8 w-px bg-slate-100 hidden sm:block" />
                       <div className="text-right flex-1 sm:flex-none">
                         <p className="text-[8px] uppercase font-black text-slate-300 tracking-widest mb-1">Target</p>
-                        <p className="text-[11px] md:text-sm font-black text-slate-700 uppercase">{shipment.destination.name || 'Hub'}</p>
+                        <p className="text-[11px] md:text-sm font-black text-slate-700 uppercase">{shipment.destination?.name || 'Hub'}</p>
                       </div>
                     </div>
                   </div>
@@ -412,7 +458,7 @@ const AdminPortal: React.FC = () => {
                           disabled={deletingShipmentId === shipment.id}
                           className="text-[9px] font-black uppercase bg-red-500 text-white px-4 py-2.5 rounded-lg hover:bg-red-600 transition-all text-center flex items-center justify-center gap-2"
                         >
-                          {deletingShipmentId === shipment.id ? 'Deleting…' : <><Trash2 className="w-3.5 h-3.5" /> Delete Shipment</>}
+                          {deletingShipmentId === shipment.id ? 'Deleting...' : <><Trash2 className="w-3.5 h-3.5" /> Delete Shipment</>}
                         </button>
                       </div>
                     </div>
@@ -446,11 +492,11 @@ const AdminPortal: React.FC = () => {
                 {adminLogs.length > 0 ? adminLogs.map((log) => (
                   <div key={log.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <span className="text-[10px] uppercase tracking-[0.35em] font-black text-slate-500">{new Date(log.timestamp).toLocaleString()}</span>
+                      <span className="text-[10px] uppercase tracking-[0.35em] font-black text-slate-500">{formatFirestoreDate(log.timestamp)}</span>
                       <span className="text-[10px] uppercase tracking-[0.35em] font-black text-fdx-purple flex items-center gap-2"><ClipboardList className="w-3.5 h-3.5" />{log.action}</span>
                     </div>
                     <p className="text-sm text-slate-700 font-bold">Shipment: <span className="text-slate-500 font-medium">{log.shipmentId}</span></p>
-                    <p className="text-[12px] text-slate-500 mt-2">{log.details}</p>
+                    <p className="text-[12px] text-slate-500 mt-2">{formatLogDetails(log.details)}</p>
                   </div>
                 )) : (
                   <div className="text-center py-12 text-slate-400 uppercase tracking-[0.35em] font-black text-[10px] border border-dashed border-slate-200 rounded-2xl">
