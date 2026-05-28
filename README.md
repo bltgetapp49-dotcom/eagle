@@ -1,7 +1,6 @@
+# fx shipping
 
-# Fdx Logistics
-
-This repository runs the Fdx logistics tracking and admin portal locally.
+This repository runs the fx logistics tracking and admin portal locally.
 
 ## Run Locally
 
@@ -31,4 +30,5 @@ This project now uses Vercel serverless functions for backend API routes and Fir
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
 3. Deploy from the project root:
    `vercel --prod`
+
 # eagle

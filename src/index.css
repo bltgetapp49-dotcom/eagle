@@ -2,9 +2,9 @@
 @import "leaflet/dist/leaflet.css";
 
 @theme {
-  --color-fdx-purple: #4D148C;
-  --color-fdx-orange: #FF6600;
-  --color-fdx-dark: #333333;
+  --color-fx-purple: #4d148c;
+  --color-fx-orange: #ff6600;
+  --color-fx-dark: #333333;
 }
 
 :root {
